@@ -12,7 +12,7 @@ const logtag = '[service/api/auth]';
 class Auth {
     static async createUser(userName, password) {
         try {
-            const encryptedUserName = cryptUtils.encryptUserName(userName);
+            const encryptedUserName = cryptUtils.encryptString(userName);
             const passHash = cryptUtils.convertPasswordToHash(password);
             const response = await authClient.createUser(encryptedUserName, passHash);
             const message = response && response.message || '';
@@ -24,7 +24,7 @@ class Auth {
 
     static async loginUser(userName, password) {
         try {
-            const encryptedUserName = cryptUtils.encryptUserName(userName);
+            const encryptedUserName = cryptUtils.encryptString(userName);
             const passHash = cryptUtils.convertPasswordToHash(password);
             const response = await authClient.login(encryptedUserName, passHash);
             const message = response && response.message || '';
@@ -39,7 +39,7 @@ class Auth {
 
     static async logoutUser(userName) {
         try {
-            const encryptedUserName = cryptUtils.encryptUserName(userName);
+            const encryptedUserName = cryptUtils.encryptString(userName);
             const response = await authClient.logout(encryptedUserName, constants.AUTH.SESSION_TOKEN);
             const message = response && response.message || '';
             constants.AUTH.SESSION_TOKEN = undefined;
@@ -52,7 +52,7 @@ class Auth {
 
     static async checkUserExists(userName) {
         try {
-            const encryptedUserName = cryptUtils.encryptUserName(userName);
+            const encryptedUserName = cryptUtils.encryptString(userName);
             await authClient.checkUserExists(encryptedUserName);
         } catch(err) {
             throw err;

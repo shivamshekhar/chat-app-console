@@ -68,7 +68,7 @@ class Ui {
           );
         })
         .on(constants.APP_STATES.POLL, async (friendName) => {
-          await this._gracefulErrorHandler(this._poll.bind(this, friendName));
+          this._gracefulErrorHandler(this._poll.bind(this, friendName));
         })
         .on(constants.APP_STATES.QUIT, resolve)
         .on(constants.APP_STATES.ERROR, reject);
@@ -146,27 +146,17 @@ class Ui {
     );
     const userName = await rlQuestionPromisified(`Enter user name : `);
     const password = await rlQuestionPromisified(`Enter password : `);
-    const yn = await rlQuestionPromisified(
-      `Name : ${userName}, Pass : ****.\nPress 'y' to confirm, any other key to re-enter : `
-    );
-    switch (yn) {
-      case "y":
-        try {
-          const message = await AuthApi.loginUser(userName, password);
-          L.info(`${message}\n`);
-          return this.appState.emit(constants.APP_STATES.SELECT_FRIEND);
-        } catch (err) {
-          L.info(
-            `Error occurred while logging in user : ${
-              (err && err.error) || err
-            }`
-          );
-          await rlQuestionPromisified("Press any key to continue....");
-          return this.appState.emit(constants.APP_STATES.MAIN_MENU);
-        }
-        break;
-      default:
-        return this.appState.emit(constants.APP_STATES.LOGIN);
+
+    try {
+      const message = await AuthApi.loginUser(userName, password);
+      L.info(`${message}\n`);
+      return this.appState.emit(constants.APP_STATES.SELECT_FRIEND);
+    } catch (err) {
+      L.info(
+        `Error occurred while logging in user : ${(err && err.error) || err}`
+      );
+      await rlQuestionPromisified("Press any key to continue....");
+      return this.appState.emit(constants.APP_STATES.MAIN_MENU);
     }
   }
 
@@ -204,7 +194,7 @@ class Ui {
     try {
       await MessagingApi.sendMessage(message, friendName);
     } catch (err) {
-      L.info(
+      L.error(
         `Error occurred while sending message : ${(err && err.error) || err}`
       );
     }
@@ -212,19 +202,19 @@ class Ui {
   }
 
   async _poll(friendName) {
-    setInterval(async () => {
-      const messages = await MessagingApi.poll();
+    const messages = await MessagingApi.poll();
 
-      for(let m of messages) {
-        if(m.sentFrom === friendName) {
-            L.info(`\n${friendName} : ${m.message}`);
-        }
+    for (let m of messages) {
+      if (m.sentFrom === friendName) {
+        L.info(`\n${friendName} : ${m.message}`);
       }
+    }
 
-      if(messages.filter(m => (m.sentFrom === friendName)).length > 0) {
-        this.appState.emit(constants.APP_STATES.CHAT, friendName);
-      }
-    }, constants.POLL.DURATION);
+    if (messages.length) {
+      this.appState.emit(constants.APP_STATES.CHAT, friendName);
+    }
+
+    this.appState.emit(constants.APP_STATES.POLL, friendName);
   }
 
   async _gracefulErrorHandler(promiseFunc, ...args) {
