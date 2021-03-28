@@ -62,7 +62,7 @@ class Messaging extends BaseClient {
             method : 'GET',
             json : true,
             headers : {
-                'session_token' : sessionToken
+                'session-token' : sessionToken
             }
         });
     }
