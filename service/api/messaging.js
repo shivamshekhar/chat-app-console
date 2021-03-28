@@ -13,9 +13,10 @@ const logtag = '[service/api/auth]';
 class Auth {
     static async sendMessage(message, friendName) {
         try {
-            const encryptedUserName = cryptUtils.encryptUserName(constants.AUTH.USERNAME);
-            const encryptedFriendName = cryptUtils.encryptUserName(friendName);
-            await messagingClient.send(encryptedUserName, message, encryptedFriendName, constants.AUTH.SESSION_TOKEN);
+            const encryptedUserName = cryptUtils.encryptString(constants.AUTH.USERNAME);
+            const encryptedFriendName = cryptUtils.encryptString(friendName);
+            const encryptedMessage = cryptUtils.encryptString(message);
+            await messagingClient.send(encryptedUserName, encryptedMessage, encryptedFriendName, constants.AUTH.SESSION_TOKEN);
         } catch (err) {
             throw err;
         }
@@ -24,8 +25,12 @@ class Auth {
     static async poll() {
         let messages = [];
         try {
-            const encryptedUserName = cryptUtils.encryptUserName(constants.AUTH.USERNAME);
-            messages = await messagingClient.poll(encryptedUserName, constants.AUTH.SESSION_TOKEN);
+            const encryptedUserName = cryptUtils.encryptString(constants.AUTH.USERNAME);
+            const encryptedMessages = await messagingClient.poll(encryptedUserName, constants.AUTH.SESSION_TOKEN);
+            for(let em of encryptedMessages) {
+                em.message = cryptUtils.decryptString(em.message);
+                messages.push(em);
+            }
         } catch (err) {
             L.error(err);
         }
