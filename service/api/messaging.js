@@ -29,6 +29,7 @@ class Auth {
             const encryptedMessages = await messagingClient.poll(encryptedUserName, constants.AUTH.SESSION_TOKEN);
             for(let em of encryptedMessages) {
                 em.message = cryptUtils.decryptString(em.message);
+                em.sentFrom = cryptUtils.decryptString(em.sentFrom);
                 messages.push(em);
             }
         } catch (err) {

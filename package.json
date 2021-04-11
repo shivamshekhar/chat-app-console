@@ -1,6 +1,6 @@
 {
   "name": "chat-app-console",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A simple console client for chat app",
   "main": "app.js",
   "scripts": {
