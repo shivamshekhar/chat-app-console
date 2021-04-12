@@ -1,3 +1,10 @@
+![No longer maintained](https://img.shields.io/badge/Maintenance-OFF-red.svg)
+### [DEPRECATED] This repository is no longer maintained
+> 
+> No longer required as a client and may not be compatible with newer versions of [chat-app-backend](https://github.com/shivamshekhar/chat-app-backend) server. Use [chat-app-frontend](https://github.com/shivamshekhar/chat-app-frontend) as a client instead.
+> 
+> ~Shivam
+
 # chat-app-console
 ## Description
 
